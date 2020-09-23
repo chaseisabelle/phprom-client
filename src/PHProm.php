@@ -166,7 +166,7 @@ class PHProm
         $details = $status->details ?? null;
 
         if ($code || $details) {
-            throw new \Exception($details, $code);
+            throw new \Exception($details ?? 'unkown grpc error', $code ?? 0);
         }
 
         if (!$response) {
