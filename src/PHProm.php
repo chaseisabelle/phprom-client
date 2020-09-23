@@ -1,6 +1,6 @@
 <?php
 
-namespace ChaseIsabelle\PHProm;
+namespace PHProm;
 
 use PHProm\V1\GetRequest;
 use PHProm\V1\RecordGaugeRequest;

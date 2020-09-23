@@ -1,8 +1,8 @@
 <?php
 
-namespace ChaseIsabelle\PHProm;
+namespace PHProm;
 
-class Stopwatch
+class Timer
 {
     /**
      * @var Histogram

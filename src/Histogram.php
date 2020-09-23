@@ -1,6 +1,6 @@
 <?php
 
-namespace ChaseIsabelle\PHProm;
+namespace PHProm;
 
 class Histogram extends Metric
 {
