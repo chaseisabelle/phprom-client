@@ -31,7 +31,7 @@ class Histogram extends Metric
 
     protected function _record(float $value, array $labels): void
     {
-        $this->getPHProm()->recordCounter(
+        $this->getPHProm()->recordHistogram(
             $this->getNamespace(),
             $this->getName(),
             $value,

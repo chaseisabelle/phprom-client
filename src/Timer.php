@@ -25,6 +25,8 @@ class Timer
     {
         $this->start = null;
         $this->stop  = null;
+
+        return $this;
     }
 
     public function start(): self
@@ -32,6 +34,8 @@ class Timer
         $this->reset();
 
         $this->start = self::microtime();
+
+        return $this;
     }
 
     public function stop(): self
@@ -41,6 +45,8 @@ class Timer
         }
 
         $this->stop = self::microtime();
+
+        return $this;
     }
 
     public function interval(): float
@@ -55,6 +61,8 @@ class Timer
     public function record(array $labels = []): self
     {
         $this->getHistogram()->record($this->interval(), $labels);
+
+        return $this;
     }
 
     private static function microtime(): float

@@ -28,9 +28,9 @@ class PHProm
         ]);
     }
 
-    public function get()
+    public function get(): string
     {
-        return $this->wait($this->client->Get(new GetRequest()))->getMetrics();
+        return $this->_wait($this->client->Get(new GetRequest()))->getMetrics();
     }
 
     public function registerCounter(
@@ -40,7 +40,7 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->wait($this->client->RegisterCounter((new RegisterCounterRequest())
+        return $this->_wait($this->client->RegisterCounter((new RegisterCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
@@ -56,7 +56,7 @@ class PHProm
         array $buckets = []
     ): bool
     {
-        return $this->wait($this->client->RegisterHistogram((new RegisterHistogramRequest())
+        return $this->_wait($this->client->RegisterHistogram((new RegisterHistogramRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
@@ -72,7 +72,7 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->wait($this->client->RegisterSummary((new RegisterSummaryRequest())
+        return $this->_wait($this->client->RegisterSummary((new RegisterSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
@@ -87,7 +87,7 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->wait($this->client->RegisterGauge((new RegisterGaugeRequest())
+        return $this->_wait($this->client->RegisterGauge((new RegisterGaugeRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
@@ -102,7 +102,7 @@ class PHProm
         array $labels = []
     )
     {
-        $this->wait($this->client->RecordCounter((new RecordCounterRequest())
+        $this->_wait($this->client->RecordCounter((new RecordCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
@@ -114,16 +114,14 @@ class PHProm
         string $namespace,
         string $name,
         float $value = 1,
-        array $labels = [],
-        array $buckets = []
+        array $labels = []
     )
     {
-        $this->wait($this->client->RecordHistogram((new RecordHistogramRequest())
+        $this->_wait($this->client->RecordHistogram((new RecordHistogramRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
             ->setLabels($labels)
-            ->setBuckets($buckets)
         ));
     }
 
@@ -134,7 +132,7 @@ class PHProm
         array $labels = []
     )
     {
-        $this->wait($this->client->RecordSummary((new RecordSummaryRequest())
+        $this->_wait($this->client->RecordSummary((new RecordSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
@@ -149,7 +147,7 @@ class PHProm
         array $labels = []
     )
     {
-        $this->wait($this->client->RecordGauge((new RecordGaugeRequest())
+        $this->_wait($this->client->RecordGauge((new RecordGaugeRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
@@ -157,7 +155,7 @@ class PHProm
         ));
     }
 
-    protected function wait(UnaryCall $call)
+    protected function _wait(UnaryCall $call)
     {
         list($response, $status) = $call->wait();
 
