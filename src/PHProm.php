@@ -2,6 +2,7 @@
 
 namespace PHProm;
 
+use Grpc\UnaryCall;
 use PHProm\V1\GetRequest;
 use PHProm\V1\RecordGaugeRequest;
 use PHProm\V1\RecordHistogramRequest;
@@ -21,13 +22,13 @@ class PHProm
     public function __construct(string $address)
     {
         $this->client = new ServiceClient('host.docker.internal:3333', [
-            'credentials' => Grpc\ChannelCredentials::createInsecure()
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
     }
 
-    public function get(): string
+    public function get()
     {
-        return $this->client->Get(new GetRequest())->getMetrics();
+        return $this->wait($this->client->Get(new GetRequest()))->getMetrics();
     }
 
     public function registerCounter(
@@ -37,12 +38,12 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->client->RegisterCounter((new RegisterCounterRequest())
+        return $this->wait($this->client->RegisterCounter((new RegisterCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
             ->setLabels($labels)
-        )->getRegistered();
+        ))->getRegistered();
     }
 
     public function registerHistogram(
@@ -53,13 +54,13 @@ class PHProm
         array $buckets = []
     ): bool
     {
-        return $this->client->RegisterHistogram((new RegisterHistogramRequest())
+        return $this->wait($this->client->RegisterHistogram((new RegisterHistogramRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
             ->setLabels($labels)
             ->setBuckets($buckets)
-        )->getRegistered();
+        ))->getRegistered();
     }
 
     public function registerSummary(
@@ -69,12 +70,12 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->client->RegisterSummary((new RegisterSummaryRequest())
+        return $this->wait($this->client->RegisterSummary((new RegisterSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
             ->setLabels($labels)
-        )->getRegistered();
+        ))->getRegistered();
     }
 
     public function registerGauge(
@@ -84,12 +85,12 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->client->RegisterSummary((new RegisterSummaryRequest())
+        return $this->wait($this->client->RegisterSummary((new RegisterSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
             ->setLabels($labels)
-        )->getRegistered();
+        ))->getRegistered();
     }
 
     public function recordCounter(
@@ -99,12 +100,12 @@ class PHProm
         array $labels = []
     )
     {
-        $this->client->RecordHistogram((new RecordCounterRequest())
+        $this->wait($this->client->RecordHistogram((new RecordCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
             ->setLabels($labels)
-        );
+        ));
     }
 
     public function recordHistogram(
@@ -115,13 +116,13 @@ class PHProm
         array $buckets = []
     )
     {
-        $this->client->RecordHistogram((new RecordHistogramRequest())
+        $this->wait($this->client->RecordHistogram((new RecordHistogramRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
             ->setLabels($labels)
             ->setBuckets($buckets)
-        );
+        ));
     }
 
     public function recordSummary(
@@ -131,12 +132,12 @@ class PHProm
         array $labels = []
     )
     {
-        $this->client->RecordSummary((new RecordSummaryRequest())
+        $this->wait($this->client->RecordSummary((new RecordSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
             ->setLabels($labels)
-        );
+        ));
     }
 
     public function recordGauge(
@@ -146,11 +147,30 @@ class PHProm
         array $labels = []
     )
     {
-        $this->client->RecordGauge((new RecordGaugeRequest())
+        $this->wait($this->client->RecordGauge((new RecordGaugeRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
             ->setLabels($labels)
-        );
+        ));
+    }
+
+    protected function wait(UnaryCall $call)
+    {
+        list($response, $status) = $call->wait();
+
+        $status  = $status ?? new \stdClass();
+        $code    = $status->code ?? null;
+        $details = $status->details ?? null;
+
+        if ($code || $details) {
+            throw new \Exception($details, $code);
+        }
+
+        if (!$response) {
+            throw new \Exception('empty response with no error');
+        }
+
+        return $response;
     }
 }
