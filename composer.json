@@ -1,0 +1,34 @@
+{
+  "name": "chaseisabelle/phprom",
+  "description": "phprom client",
+  "type": "library",
+  "keywords": [
+    "prometheus"
+  ],
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "chase isabelle",
+      "homepage": ""
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "grpc/grpc": "v1.7.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "PHProm\\": "src/",
+      "PHProm\\V1\\": "src/pb/PHProm/V1/",
+      "GPBMetadata\\": "src/pb/GPBMetadata/"
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "Test\\Prometheus\\": "tests/"
+    }
+  }
+}
