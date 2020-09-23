@@ -4,10 +4,12 @@ namespace PHProm;
 
 use Grpc\UnaryCall;
 use PHProm\V1\GetRequest;
+use PHProm\V1\RecordCounterRequest;
 use PHProm\V1\RecordGaugeRequest;
 use PHProm\V1\RecordHistogramRequest;
 use PHProm\V1\RecordSummaryRequest;
 use PHProm\V1\RegisterCounterRequest;
+use PHProm\V1\RegisterGaugeRequest;
 use PHProm\V1\RegisterHistogramRequest;
 use PHProm\V1\RegisterSummaryRequest;
 use PHProm\V1\ServiceClient;
@@ -85,7 +87,7 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->wait($this->client->RegisterSummary((new RegisterSummaryRequest())
+        return $this->wait($this->client->RegisterGauge((new RegisterGaugeRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
@@ -100,7 +102,7 @@ class PHProm
         array $labels = []
     )
     {
-        $this->wait($this->client->RecordHistogram((new RecordCounterRequest())
+        $this->wait($this->client->RecordCounter((new RecordCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
