@@ -21,9 +21,9 @@ class PHProm
      */
     protected $client;
 
-    public function __construct(string $address)
+    public function __construct(string $address = '127.0.0.1:3333')
     {
-        $this->client = new ServiceClient('host.docker.internal:3333', [
+        $this->client = new ServiceClient($address, [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
     }
