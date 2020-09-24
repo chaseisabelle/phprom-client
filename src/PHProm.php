@@ -2,6 +2,7 @@
 
 namespace PHProm;
 
+use Exception;
 use Grpc\UnaryCall;
 use PHProm\V1\GetRequest;
 use PHProm\V1\RecordCounterRequest;
@@ -14,6 +15,11 @@ use PHProm\V1\RegisterHistogramRequest;
 use PHProm\V1\RegisterSummaryRequest;
 use PHProm\V1\ServiceClient;
 
+/**
+ * the basic client
+ *
+ * @package PHProm
+ */
 class PHProm
 {
     /**
@@ -21,6 +27,9 @@ class PHProm
      */
     protected $client;
 
+    /**
+     * @param string $address
+     */
     public function __construct(string $address = '127.0.0.1:3333')
     {
         $this->client = new ServiceClient($address, [
@@ -28,11 +37,25 @@ class PHProm
         ]);
     }
 
+    /**
+     * fetches the metrics as a string
+     *
+     * @return string
+     * @throws Exception
+     */
     public function get(): string
     {
         return $this->_wait($this->client->Get(new GetRequest()))->getMetrics();
     }
 
+    /**
+     * @param string $namespace
+     * @param string $name
+     * @param string $description
+     * @param array  $labels the labels names without values
+     * @return bool true if the metric was registered, false if it is already registered
+     * @throws Exception
+     */
     public function registerCounter(
         string $namespace,
         string $name,
@@ -48,6 +71,15 @@ class PHProm
         ))->getRegistered();
     }
 
+    /**
+     * @param string $namespace
+     * @param string $name
+     * @param string $description
+     * @param array  $labels the labels names without values
+     * @param array  $buckets custom bucket values - use default if not sure
+     * @return bool true if the metric was registered, false if it is already registered
+     * @throws Exception
+     */
     public function registerHistogram(
         string $namespace,
         string $name,
@@ -65,6 +97,14 @@ class PHProm
         ))->getRegistered();
     }
 
+    /**
+     * @param string $namespace
+     * @param string $name
+     * @param string $description
+     * @param array  $labels the labels names without values
+     * @return bool true if the metric was registered, false if it is already registered
+     * @throws Exception
+     */
     public function registerSummary(
         string $namespace,
         string $name,
@@ -80,6 +120,14 @@ class PHProm
         ))->getRegistered();
     }
 
+    /**
+     * @param string $namespace
+     * @param string $name
+     * @param string $description
+     * @param array  $labels the labels names without values
+     * @return bool true if the metric was registered, false if it is already registered
+     * @throws Exception
+     */
     public function registerGauge(
         string $namespace,
         string $name,
@@ -95,6 +143,15 @@ class PHProm
         ))->getRegistered();
     }
 
+    /**
+     * records the given metric - must be registered first!
+     *
+     * @param string    $namespace
+     * @param string    $name
+     * @param float|int $value
+     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @throws Exception
+     */
     public function recordCounter(
         string $namespace,
         string $name,
@@ -110,6 +167,15 @@ class PHProm
         ));
     }
 
+    /**
+     * records the given metric - must be registered first!
+     *
+     * @param string    $namespace
+     * @param string    $name
+     * @param float|int $value
+     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @throws Exception
+     */
     public function recordHistogram(
         string $namespace,
         string $name,
@@ -125,6 +191,15 @@ class PHProm
         ));
     }
 
+    /**
+     * records the given metric - must be registered first!
+     *
+     * @param string    $namespace
+     * @param string    $name
+     * @param float|int $value
+     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @throws Exception
+     */
     public function recordSummary(
         string $namespace,
         string $name,
@@ -140,6 +215,15 @@ class PHProm
         ));
     }
 
+    /**
+     * records the given metric - must be registered first!
+     *
+     * @param string    $namespace
+     * @param string    $name
+     * @param float|int $value
+     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @throws Exception
+     */
     public function recordGauge(
         string $namespace,
         string $name,
@@ -155,6 +239,13 @@ class PHProm
         ));
     }
 
+    /**
+     * generic wrapper for the wait method and error handling
+     *
+     * @param UnaryCall $call
+     * @return mixed
+     * @throws Exception
+     */
     protected function _wait(UnaryCall $call)
     {
         list($response, $status) = $call->wait();
@@ -164,11 +255,11 @@ class PHProm
         $details = $status->details ?? null;
 
         if ($code || $details) {
-            throw new \Exception($details ?? 'unkown grpc error', $code ?? 0);
+            throw new Exception($details ?? 'unkown grpc error', $code ?? 0);
         }
 
         if (!$response) {
-            throw new \Exception('empty response with no error');
+            throw new Exception('empty response with no error');
         }
 
         return $response;

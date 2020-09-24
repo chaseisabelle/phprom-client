@@ -2,6 +2,13 @@
 
 namespace PHProm;
 
+use Exception;
+
+/**
+ * timer for latency histograms
+ *
+ * @package PHProm
+ */
 class Timer
 {
     /**
@@ -11,16 +18,27 @@ class Timer
     private $start     = null;
     private $stop      = null;
 
+    /**
+     * @param Histogram $histogram use `$histogram = new Histogram()`
+     */
     public function __construct(Histogram $histogram)
     {
         $this->histogram = $histogram;
     }
 
+    /**
+     * @return Histogram
+     */
     public function getHistogram(): Histogram
     {
         return $this->histogram;
     }
 
+    /**
+     * resets the timer
+     *
+     * @return $this
+     */
     public function reset(): self
     {
         $this->start = null;
@@ -29,6 +47,11 @@ class Timer
         return $this;
     }
 
+    /**
+     * starts the timer
+     *
+     * @return $this
+     */
     public function start(): self
     {
         $this->reset();
@@ -38,10 +61,15 @@ class Timer
         return $this;
     }
 
+    /**
+     * stop the timer
+     * @return $this
+     * @throws Exception if timer not started
+     */
     public function stop(): self
     {
         if (!$this->start) {
-            throw new \Exception('stopwatch not started');
+            throw new Exception('timer not started');
         }
 
         $this->stop = self::microtime();
@@ -49,15 +77,28 @@ class Timer
         return $this;
     }
 
+    /**
+     * get the latency interval
+     *
+     * @return float interval in seconds
+     * @throws Exception if timer not stopped
+     */
     public function interval(): float
     {
         if (!$this->stop) {
-            throw new \Exception('stopwatch not stopped');
+            throw new Exception('timer not stopped');
         }
 
         return $this->stop - $this->start;
     }
 
+    /**
+     * record latency with histogram
+     *
+     * @param array<string> $labels histogram labels with values
+     * @return $this
+     * @throws Exception if timer not stopped
+     */
     public function record(array $labels = []): self
     {
         $this->getHistogram()->record($this->interval(), $labels);
@@ -65,6 +106,9 @@ class Timer
         return $this;
     }
 
+    /**
+     * @return float current time in seconds
+     */
     private static function microtime(): float
     {
         return microtime(true);
