@@ -3,13 +3,13 @@
   "description": "phprom client",
   "type": "library",
   "keywords": [
-    "prometheus"
+    "prometheus",
+    "phprom"
   ],
   "license": "proprietary",
   "authors": [
     {
-      "name": "chase isabelle",
-      "homepage": ""
+      "name": "chase isabelle"
     }
   ],
   "require": {
@@ -28,8 +28,12 @@
     }
   },
   "autoload-dev": {
-    "psr-0": {
-      "Test\\Prometheus\\": "tests/"
+    "psr-4": {
+      "PHProm\\Test\\": "tests/"
     }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true
   }
 }
