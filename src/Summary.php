@@ -11,6 +11,87 @@ use Exception;
  */
 class Summary extends Metric
 {
+    protected $objectives = [];
+    protected $maxAge = 0;
+    protected $ageBuckets = 0;
+    protected $bufCap = 0;
+
+    /**
+     * @return array<float, float>
+     */
+    public function getObjectives(): array
+    {
+        return $this->objectives;
+    }
+
+    /**
+     * @param array<float, float> $objectives
+     * @return Summary
+     */
+    public function setObjectives(array $objectives): self
+    {
+        $this->objectives = $objectives;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxAge(): int
+    {
+        return $this->maxAge;
+    }
+
+    /**
+     * @param int $maxAge
+     * @return Summary
+     */
+    public function setMaxAge(int $maxAge): self
+    {
+        $this->maxAge = $maxAge;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeBuckets(): int
+    {
+        return $this->ageBuckets;
+    }
+
+    /**
+     * @param int $ageBuckets
+     * @return Summary
+     */
+    public function setAgeBuckets(int $ageBuckets): self
+    {
+        $this->ageBuckets = $ageBuckets;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBufCap(): int
+    {
+        return $this->bufCap;
+    }
+
+    /**
+     * @param int $bufCap
+     * @return Summary
+     */
+    public function setBufCap(int $bufCap): self
+    {
+        $this->bufCap = $bufCap;
+
+        return $this;
+    }
+
     /**
      * registers the metrics ONLY if it is not already registered
      *

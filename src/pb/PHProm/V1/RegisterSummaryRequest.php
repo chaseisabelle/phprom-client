@@ -29,6 +29,22 @@ class RegisterSummaryRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated string labels = 4;</code>
      */
     private $labels;
+    /**
+     * Generated from protobuf field <code>repeated .PHProm.v1.objective objectives = 5;</code>
+     */
+    private $objectives;
+    /**
+     * Generated from protobuf field <code>int64 maxAge = 6;</code>
+     */
+    protected $maxAge = 0;
+    /**
+     * Generated from protobuf field <code>uint32 ageBuckets = 7;</code>
+     */
+    protected $ageBuckets = 0;
+    /**
+     * Generated from protobuf field <code>uint32 bufCap = 8;</code>
+     */
+    protected $bufCap = 0;
 
     /**
      * Constructor.
@@ -40,6 +56,10 @@ class RegisterSummaryRequest extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *     @type string $description
      *     @type string[]|\Google\Protobuf\Internal\RepeatedField $labels
+     *     @type \PHProm\V1\objective[]|\Google\Protobuf\Internal\RepeatedField $objectives
+     *     @type int|string $maxAge
+     *     @type int $ageBuckets
+     *     @type int $bufCap
      * }
      */
     public function __construct($data = NULL) {
@@ -131,6 +151,94 @@ class RegisterSummaryRequest extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
         $this->labels = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>repeated .PHProm.v1.objective objectives = 5;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getObjectives()
+    {
+        return $this->objectives;
+    }
+
+    /**
+     * Generated from protobuf field <code>repeated .PHProm.v1.objective objectives = 5;</code>
+     * @param \PHProm\V1\objective[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setObjectives($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \PHProm\V1\objective::class);
+        $this->objectives = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 maxAge = 6;</code>
+     * @return int|string
+     */
+    public function getMaxAge()
+    {
+        return $this->maxAge;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 maxAge = 6;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setMaxAge($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->maxAge = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>uint32 ageBuckets = 7;</code>
+     * @return int
+     */
+    public function getAgeBuckets()
+    {
+        return $this->ageBuckets;
+    }
+
+    /**
+     * Generated from protobuf field <code>uint32 ageBuckets = 7;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setAgeBuckets($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->ageBuckets = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>uint32 bufCap = 8;</code>
+     * @return int
+     */
+    public function getBufCap()
+    {
+        return $this->bufCap;
+    }
+
+    /**
+     * Generated from protobuf field <code>uint32 bufCap = 8;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setBufCap($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->bufCap = $var;
 
         return $this;
     }

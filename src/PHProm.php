@@ -49,10 +49,10 @@ class PHProm
     }
 
     /**
-     * @param string $namespace
-     * @param string $name
-     * @param string $description
-     * @param array  $labels the labels names without values
+     * @param string        $namespace
+     * @param string        $name
+     * @param string        $description
+     * @param array<string> $labels the labels names without values
      * @return bool true if the metric was registered, false if it is already registered
      * @throws Exception
      */
@@ -72,11 +72,11 @@ class PHProm
     }
 
     /**
-     * @param string $namespace
-     * @param string $name
-     * @param string $description
-     * @param array  $labels the labels names without values
-     * @param array  $buckets custom bucket values - use default if not sure
+     * @param string        $namespace
+     * @param string        $name
+     * @param string        $description
+     * @param array<string> $labels  the labels names without values
+     * @param array<float>  $buckets custom bucket values - use default if not sure
      * @return bool true if the metric was registered, false if it is already registered
      * @throws Exception
      */
@@ -98,10 +98,14 @@ class PHProm
     }
 
     /**
-     * @param string $namespace
-     * @param string $name
-     * @param string $description
-     * @param array  $labels the labels names without values
+     * @param string              $namespace
+     * @param string              $name
+     * @param string              $description
+     * @param array<string>       $labels the labels names without values
+     * @param array<float, float> $objectives
+     * @param int                 $maxAge
+     * @param int                 $ageBuckets
+     * @param int                 $bufCap
      * @return bool true if the metric was registered, false if it is already registered
      * @throws Exception
      */
@@ -109,7 +113,11 @@ class PHProm
         string $namespace,
         string $name,
         string $description,
-        array $labels = []
+        array $labels = [],
+        array $objectives = [],
+        int $maxAge = 0,
+        int $ageBuckets = 0,
+        int $bufCap = 0
     ): bool
     {
         return $this->_wait($this->client->RegisterSummary((new RegisterSummaryRequest())
@@ -117,14 +125,18 @@ class PHProm
             ->setName($name)
             ->setDescription($description)
             ->setLabels($labels)
+            ->setObjectives($objectives)
+            ->setAgeBuckets($ageBuckets)
+            ->setMaxAge($maxAge)
+            ->setBufCap($bufCap)
         ))->getRegistered();
     }
 
     /**
-     * @param string $namespace
-     * @param string $name
-     * @param string $description
-     * @param array  $labels the labels names without values
+     * @param string        $namespace
+     * @param string        $name
+     * @param string        $description
+     * @param array<string> $labels the labels names without values
      * @return bool true if the metric was registered, false if it is already registered
      * @throws Exception
      */
@@ -146,10 +158,10 @@ class PHProm
     /**
      * records the given metric - must be registered first!
      *
-     * @param string    $namespace
-     * @param string    $name
-     * @param float|int $value
-     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @param string                $namespace
+     * @param string                $name
+     * @param float|int             $value
+     * @param array<string, string> $labels map with label name => label value (eg. ['foo' => 'bar'])
      * @throws Exception
      */
     public function recordCounter(
@@ -170,10 +182,10 @@ class PHProm
     /**
      * records the given metric - must be registered first!
      *
-     * @param string    $namespace
-     * @param string    $name
-     * @param float|int $value
-     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @param string                $namespace
+     * @param string                $name
+     * @param float|int             $value
+     * @param array<string, string> $labels map with label name => label value (eg. ['foo' => 'bar'])
      * @throws Exception
      */
     public function recordHistogram(
@@ -194,10 +206,10 @@ class PHProm
     /**
      * records the given metric - must be registered first!
      *
-     * @param string    $namespace
-     * @param string    $name
-     * @param float|int $value
-     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @param string                $namespace
+     * @param string                $name
+     * @param float|int             $value
+     * @param array<string, string> $labels map with label name => label value (eg. ['foo' => 'bar'])
      * @throws Exception
      */
     public function recordSummary(
@@ -218,10 +230,10 @@ class PHProm
     /**
      * records the given metric - must be registered first!
      *
-     * @param string    $namespace
-     * @param string    $name
-     * @param float|int $value
-     * @param array     $labels map with label name => label value (eg. ['foo' => 'bar'])
+     * @param string                $namespace
+     * @param string                $name
+     * @param float|int             $value
+     * @param array<string, string> $labels map with label name => label value (eg. ['foo' => 'bar'])
      * @throws Exception
      */
     public function recordGauge(
