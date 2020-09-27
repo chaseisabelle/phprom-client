@@ -5,8 +5,9 @@ a client lib for [phprom](https://github.com/chaseisabelle/phprom), a prometheus
 ### prerequisites
 
 - install the [server](https://github.com/chaseisabelle/phprom)
-- install the [client](https://packagist.org/packages/chaseisabelle/phprom-client)
+- install the [client](https://packagist.org/packages/chaseisabelle/phprom-client) or [bundle](https://github.com/chaseisabelle/phprom-bundle)
     - `composer require chaseisabelle/phprom-client`
+    - `composer require chaseisabelle/phprom-bundle`
 - install [grpc extension](https://grpc.io/docs/languages/php/quickstart/)
     - `pecl install grpc`
     - or use the [docker image](https://hub.docker.com/r/grpc/php)
