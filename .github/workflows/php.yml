@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: grpc/php
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
