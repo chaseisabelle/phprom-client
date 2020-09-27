@@ -69,7 +69,11 @@ $phprom->registerSummary(
     'namespace',
     'name',
     'description',
-    ['label1', 'label2'] //<< optional
+    ['label1', 'label2'], //<< optional
+    [0.1, 0.5, 1, 2, 5], //<< objectives, optional
+    0, //<< max age, optional
+    0, //<< age buckets, optional
+    0 //<< buf cap, optional
 );
 
 $phprom->recordSummary(
@@ -134,7 +138,11 @@ $summary = (new Summary($phprom))
     ->setNamespace('namespace')
     ->setName('name')
     ->setDescription('description')
-    ->setLabels(['label1', 'label2']); //<< optional
+    ->setLabels(['label1', 'label2']) //<< optional
+    ->setObjectives([0.1, 0.5, 1, 2, 5]) //<< optional
+    ->setMaxAge(0) //<< optional
+    ->setAgeBuckets(0) //<< optional
+    ->setBufCap(0); //<< optional
 
 $summary->record(
     1.2345, 
