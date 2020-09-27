@@ -28,10 +28,19 @@ jobs:
 
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress --no-suggest && pecl install grpc
+      run: composer install --prefer-dist --no-progress --no-suggest
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
-    - name: Run test suite
-      run: vendor/bin/phpunit
+#     - name: Run test suite
+#       run: vendor/bin/phpunit
+    
+    - name: Setup PHP with pecl extension
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        tools: pecl
+        extensions: grpc
+        run: vendor/bin/phpunit  
+      
