@@ -3,6 +3,7 @@
 namespace PHProm;
 
 use Exception;
+use Grpc\ChannelCredentials;
 use Grpc\UnaryCall;
 use PHProm\V1\GetRequest;
 use PHProm\V1\RecordCounterRequest;
@@ -33,7 +34,7 @@ class PHProm
     public function __construct(string $address = '127.0.0.1:3333')
     {
         $this->client = new ServiceClient($address, [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+            'credentials' => ChannelCredentials::createInsecure()
         ]);
     }
 
