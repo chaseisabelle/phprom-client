@@ -25,6 +25,13 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
+          
+    - name: Setup PHP with pecl extension
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        tools: pecl
+        extensions: grpc
 
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
@@ -32,13 +39,6 @@ jobs:
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
-    
-    - name: Setup PHP with pecl extension
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        tools: pecl
-        extensions: grpc
         
     - name: Run test suite
       run: vendor/bin/phpunit  
