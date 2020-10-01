@@ -12,12 +12,12 @@ use Exception;
 class Summary extends Metric
 {
     protected $objectives = [];
-    protected $maxAge = 0;
+    protected $maxAge     = 0;
     protected $ageBuckets = 0;
-    protected $bufCap = 0;
+    protected $bufCap     = 0;
 
     /**
-     * @return array<float, float>
+     * @return array
      */
     public function getObjectives(): array
     {
@@ -25,7 +25,7 @@ class Summary extends Metric
     }
 
     /**
-     * @param array<float, float> $objectives
+     * @param array $objectives
      * @return Summary
      */
     public function setObjectives(array $objectives): self

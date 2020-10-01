@@ -15,8 +15,16 @@ class Timer
      * @var Histogram
      */
     private $histogram = null;
-    private $start     = null;
-    private $stop      = null;
+
+    /**
+     * @var float
+     */
+    private $start = null;
+
+    /**
+     * @var float
+     */
+    private $stop = null;
 
     /**
      * @param Histogram $histogram use `$histogram = new Histogram()`
@@ -63,6 +71,7 @@ class Timer
 
     /**
      * stop the timer
+     *
      * @return $this
      * @throws Exception if timer not started
      */
@@ -95,7 +104,7 @@ class Timer
     /**
      * record latency with histogram
      *
-     * @param array<string> $labels histogram labels with values
+     * @param array $labels histogram labels with values
      * @return $this
      * @throws Exception if timer not stopped
      */

@@ -12,12 +12,12 @@ use Exception;
 class Histogram extends Metric
 {
     /**
-     * @var array<float>
+     * @var array
      */
     private $buckets = [];
 
     /**
-     * @return array<float> the custom buckets OR empty array if using defaults
+     * @return array the custom buckets OR empty array if using defaults
      */
     public function getBuckets(): array
     {
@@ -25,7 +25,7 @@ class Histogram extends Metric
     }
 
     /**
-     * @param array<float> $buckets custom buckets
+     * @param array $buckets custom buckets
      * @return $this
      */
     public function setBuckets(array $buckets): self

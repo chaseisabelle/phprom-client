@@ -12,12 +12,32 @@ abstract class Metric
     /**
      * @var PHProm
      */
-    private $phprom      = null;
-    private $registered  = false;
-    private $namespace   = null;
-    private $name        = null;
+    private $phprom = null;
+
+    /**
+     * @var bool
+     */
+    private $registered = false;
+
+    /**
+     * @var string
+     */
+    private $namespace = null;
+
+    /**
+     * @var string
+     */
+    private $name = null;
+
+    /**
+     * @var string
+     */
     private $description = null;
-    private $labels      = [];
+
+    /**
+     * @var array
+     */
+    private $labels = [];
 
     /**
      * @param PHProm $phprom use `$phprom = new PHProm('127.0.0.1:3333')` to instantiate
@@ -134,10 +154,11 @@ abstract class Metric
     /**
      * register the metric IF NOT already registered AND record metrics
      *
-     * @param float $value
+     * @param float         $value
      * @param array<String> $labels with values
      */
-    public function record(float $value, array $labels = []): void {
+    public function record(float $value, array $labels = []): void
+    {
         $this->register();
         $this->_record($value, $labels);
     }
@@ -148,7 +169,7 @@ abstract class Metric
     abstract protected function _register(): bool;
 
     /**
-     * @param float $value
+     * @param float         $value
      * @param array<string> $labels
      */
     abstract protected function _record(float $value, array $labels): void;
