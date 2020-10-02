@@ -6,7 +6,7 @@
     "prometheus",
     "phprom"
   ],
-  "license": "proprietary",
+  "license": "MIT",
   "authors": [
     {
       "name": "chase isabelle"
