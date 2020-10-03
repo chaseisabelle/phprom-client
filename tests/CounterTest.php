@@ -83,4 +83,46 @@ class CounterTest extends PHPromTestCase
 
         $this->assertTrue($counter->registered());
     }
+
+    public function testRegRec_dynLabels()
+    {
+        $namespace   = 'test';
+        $name        = 'counter';
+        $description = 'hotdogs';
+        $labels      = ['foo' => 'bar'];
+        $value       = $this->randValue();
+
+        $phprom = $this->getMockBuilder(PHProm::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $phprom->expects($this->once())
+            ->method('registerCounter')
+            ->with(
+                $namespace,
+                $name,
+                $description,
+                array_keys($labels)
+            )
+            ->willReturn($this->randBool());
+
+        $phprom->expects($this->once())
+            ->method('recordCounter')
+            ->with(
+                $namespace,
+                $name,
+                $value,
+                $labels
+            )
+            ->willReturn($this->randBool());
+
+        $counter = (new Counter($phprom))
+            ->setNamespace($namespace)
+            ->setName($name)
+            ->setDescription($description);
+
+        $counter->record($value, $labels);
+
+        $this->assertTrue($counter->registered());
+    }
 }
