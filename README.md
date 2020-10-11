@@ -2,6 +2,10 @@
 a client lib for [phprom](https://github.com/chaseisabelle/phprom), a prometheus metric datastore for php apps
 
 ---
+### example
+see a fully functional example [here](https://github.com/chaseisabelle/phprom-example)
+
+---
 ### prerequisites
 
 - install the [server](https://github.com/chaseisabelle/phprom)
