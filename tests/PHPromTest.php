@@ -3,6 +3,7 @@
 namespace PHProm\Test;
 
 use Grpc\UnaryCall;
+use PHProm\Client;
 use PHProm\PHProm;
 use PHProm\V1\GetRequest;
 use PHProm\V1\GetResponse;
@@ -16,7 +17,6 @@ use PHProm\V1\RegisterGaugeRequest;
 use PHProm\V1\RegisterHistogramRequest;
 use PHProm\V1\RegisterResponse;
 use PHProm\V1\RegisterSummaryRequest;
-use PHProm\V1\ServiceClient;
 
 final class PHPromTest extends PHPromTestCase
 {
@@ -28,11 +28,7 @@ final class PHPromTest extends PHPromTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -40,14 +36,10 @@ final class PHPromTest extends PHPromTestCase
             ->method('getMetrics')
             ->willReturn($metrics);
 
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
-
         $client->expects($this->once())
-            ->method('Get')
+            ->method('get')
             ->with($this->isInstanceOf(GetRequest::class))
-            ->willReturn($call);
+            ->willReturn($response);
 
         $phprom = new PHProm();
 
@@ -62,16 +54,13 @@ final class PHPromTest extends PHPromTestCase
         $description = 'stone cold steve austin with a stunner';
         $labels      = ['foo'];
         $registered  = $this->randBool();
+        $test        = $this;
 
         $response = $this->getMockBuilder(RegisterResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -79,14 +68,27 @@ final class PHPromTest extends PHPromTestCase
             ->method('getRegistered')
             ->willReturn($registered);
 
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
-
         $client->expects($this->once())
-            ->method('RegisterCounter')
+            ->method('registerCounter')
             ->with($this->isInstanceOf(RegisterCounterRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RegisterCounterRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $description,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($description, $request->getDescription());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -108,16 +110,13 @@ final class PHPromTest extends PHPromTestCase
         $labels      = ['foo'];
         $buckets     = [1, 2, 3];
         $registered  = $this->randBool();
+        $test        = $this;
 
         $response = $this->getMockBuilder(RegisterResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -125,14 +124,32 @@ final class PHPromTest extends PHPromTestCase
             ->method('getRegistered')
             ->willReturn($registered);
 
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
-
         $client->expects($this->once())
             ->method('RegisterHistogram')
             ->with($this->isInstanceOf(RegisterHistogramRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RegisterHistogramRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $description,
+                $labels,
+                $buckets,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($description, $request->getDescription());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                foreach ($request->getBuckets() as $index => $bucket) {
+                    $test->assertEquals($buckets[$index], $bucket);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -154,16 +171,13 @@ final class PHPromTest extends PHPromTestCase
         $description = 'stone cold steve austin with a stunner';
         $labels      = ['foo'];
         $registered  = $this->randBool();
+        $test = $this;
 
         $response = $this->getMockBuilder(RegisterResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -171,14 +185,27 @@ final class PHPromTest extends PHPromTestCase
             ->method('getRegistered')
             ->willReturn($registered);
 
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
-
         $client->expects($this->once())
-            ->method('RegisterSummary')
+            ->method('registerSummary')
             ->with($this->isInstanceOf(RegisterSummaryRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RegisterSummaryRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $description,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($description, $request->getDescription());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -199,16 +226,13 @@ final class PHPromTest extends PHPromTestCase
         $description = 'stone cold steve austin with a stunner';
         $labels      = ['foo'];
         $registered  = $this->randBool();
+        $test = $this;
 
         $response = $this->getMockBuilder(RegisterResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -216,14 +240,27 @@ final class PHPromTest extends PHPromTestCase
             ->method('getRegistered')
             ->willReturn($registered);
 
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
-
         $client->expects($this->once())
-            ->method('RegisterGauge')
+            ->method('registerGauge')
             ->with($this->isInstanceOf(RegisterGaugeRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RegisterGaugeRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $description,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($description, $request->getDescription());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -243,27 +280,37 @@ final class PHPromTest extends PHPromTestCase
         $name      = 'counter';
         $value     = $this->randValue();
         $labels    = ['bar'];
+        $test = $this;
 
         $response = $this->getMockBuilder(RecordResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
 
         $client->expects($this->once())
-            ->method('RecordCounter')
+            ->method('recordCounter')
             ->with($this->isInstanceOf(RecordCounterRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RecordCounterRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $value,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($value, $request->getValue());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -283,27 +330,37 @@ final class PHPromTest extends PHPromTestCase
         $name      = 'histo';
         $value     = $this->randValue();
         $labels    = ['bar'];
+        $test = $this;
 
         $response = $this->getMockBuilder(RecordResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
 
         $client->expects($this->once())
             ->method('RecordHistogram')
             ->with($this->isInstanceOf(RecordHistogramRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RecordHistogramRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $value,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($value, $request->getValue());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -323,27 +380,37 @@ final class PHPromTest extends PHPromTestCase
         $name      = 'summary';
         $value     = $this->randValue();
         $labels    = ['bar'];
+        $test = $this;
 
         $response = $this->getMockBuilder(RecordResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
 
         $client->expects($this->once())
-            ->method('RecordSummary')
+            ->method('recordSummary')
             ->with($this->isInstanceOf(RecordSummaryRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RecordSummaryRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $value,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($value, $request->getValue());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 
@@ -363,27 +430,37 @@ final class PHPromTest extends PHPromTestCase
         $name      = 'gauge';
         $value     = $this->randValue();
         $labels    = ['bar'];
+        $test = $this;
 
         $response = $this->getMockBuilder(RecordResponse::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $call = $this->getMockBuilder(UnaryCall::class)
+        $client = $this->getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $client = $this->getMockBuilder(ServiceClient::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $call->expects($this->once())
-            ->method('wait')
-            ->willReturn([$response, null]);
 
         $client->expects($this->once())
-            ->method('RecordGauge')
+            ->method('recordGauge')
             ->with($this->isInstanceOf(RecordGaugeRequest::class))
-            ->willReturn($call);
+            ->willReturnCallback(function (RecordGaugeRequest $request) use (
+                $test,
+                $namespace,
+                $name,
+                $value,
+                $labels,
+                $response
+            ) {
+                $test->assertEquals($namespace, $request->getNamespace());
+                $test->assertEquals($name, $request->getName());
+                $test->assertEquals($value, $request->getValue());
+
+                foreach ($request->getLabels() as $index => $label) {
+                    $test->assertEquals($labels[$index], $label);
+                }
+
+                return $response;
+            });
 
         $phprom = new PHProm();
 

@@ -3,8 +3,6 @@
 namespace PHProm;
 
 use Exception;
-use Grpc\ChannelCredentials;
-use Grpc\UnaryCall;
 use PHProm\V1\GetRequest;
 use PHProm\V1\RecordCounterRequest;
 use PHProm\V1\RecordGaugeRequest;
@@ -14,7 +12,6 @@ use PHProm\V1\RegisterCounterRequest;
 use PHProm\V1\RegisterGaugeRequest;
 use PHProm\V1\RegisterHistogramRequest;
 use PHProm\V1\RegisterSummaryRequest;
-use PHProm\V1\ServiceClient;
 
 /**
  * the basic client
@@ -24,18 +21,45 @@ use PHProm\V1\ServiceClient;
 class PHProm
 {
     /**
-     * @var ServiceClient
+     * which interface to use
+     */
+    public const GRPC_API = 'grpc';
+    public const REST_API = 'rest';
+
+    /**
+     * @var Client
      */
     protected $client;
 
     /**
      * @param string $address
+     * @param string $api
+     * @throws Exception
      */
-    public function __construct(string $address = '127.0.0.1:3333')
+    public function __construct(string $address = '127.0.0.1:3333', string $api = self::GRPC_API)
     {
-        $this->client = new ServiceClient($address, [
-            'credentials' => ChannelCredentials::createInsecure()
-        ]);
+        switch ($api) {
+            case self::GRPC_API:
+                $this->client = new GRPCClient($address);
+
+                break;
+            case self::REST_API:
+                $this->client = new RESTClient($address);
+
+                break;
+            default:
+                throw new Exception("unsupported api: $api");
+        }
+    }
+
+    /**
+     * gets the client
+     *
+     * @return Client
+     */
+    public function client(): Client
+    {
+        return $this->client;
     }
 
     /**
@@ -46,7 +70,7 @@ class PHProm
      */
     public function get(): string
     {
-        return $this->_wait($this->client->Get(new GetRequest()))->getMetrics();
+        return $this->client()->get(new GetRequest())->getMetrics();
     }
 
     /**
@@ -64,12 +88,15 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->_wait($this->client->RegisterCounter((new RegisterCounterRequest())
+        $request = (new RegisterCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
-            ->setLabels($labels)
-        ))->getRegistered();
+            ->setLabels($labels);
+
+        return $this->client()
+            ->registerCounter($request)
+            ->getRegistered();
     }
 
     /**
@@ -89,13 +116,16 @@ class PHProm
         array $buckets = []
     ): bool
     {
-        return $this->_wait($this->client->RegisterHistogram((new RegisterHistogramRequest())
+        $request = (new RegisterHistogramRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
             ->setLabels($labels)
-            ->setBuckets($buckets)
-        ))->getRegistered();
+            ->setBuckets($buckets);
+
+        return $this->client()
+            ->registerHistogram($request)
+            ->getRegistered();
     }
 
     /**
@@ -121,7 +151,7 @@ class PHProm
         int $bufCap = 0
     ): bool
     {
-        return $this->_wait($this->client->RegisterSummary((new RegisterSummaryRequest())
+        $request = (new RegisterSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
@@ -129,8 +159,11 @@ class PHProm
             ->setObjectives($objectives)
             ->setAgeBuckets($ageBuckets)
             ->setMaxAge($maxAge)
-            ->setBufCap($bufCap)
-        ))->getRegistered();
+            ->setBufCap($bufCap);
+
+        return $this->client()
+            ->registerSummary($request)
+            ->getRegistered();
     }
 
     /**
@@ -148,12 +181,15 @@ class PHProm
         array $labels = []
     ): bool
     {
-        return $this->_wait($this->client->RegisterGauge((new RegisterGaugeRequest())
+        $request = (new RegisterGaugeRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setDescription($description)
-            ->setLabels($labels)
-        ))->getRegistered();
+            ->setLabels($labels);
+
+        return $this->client()
+            ->registerGauge($request)
+            ->getRegistered();
     }
 
     /**
@@ -172,12 +208,14 @@ class PHProm
         array $labels = []
     )
     {
-        $this->_wait($this->client->RecordCounter((new RecordCounterRequest())
+        $request = (new RecordCounterRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
-            ->setLabels($labels)
-        ));
+            ->setLabels($labels);
+
+        $this->client()
+            ->recordCounter($request);
     }
 
     /**
@@ -196,12 +234,14 @@ class PHProm
         array $labels = []
     )
     {
-        $this->_wait($this->client->RecordHistogram((new RecordHistogramRequest())
+        $request = (new RecordHistogramRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
-            ->setLabels($labels)
-        ));
+            ->setLabels($labels);
+
+        $this->client()
+            ->recordHistogram($request);
     }
 
     /**
@@ -220,12 +260,14 @@ class PHProm
         array $labels = []
     )
     {
-        $this->_wait($this->client->RecordSummary((new RecordSummaryRequest())
+        $request = (new RecordSummaryRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
-            ->setLabels($labels)
-        ));
+            ->setLabels($labels);
+
+        $this->client()
+            ->recordSummary($request);
     }
 
     /**
@@ -244,37 +286,15 @@ class PHProm
         array $labels = []
     )
     {
-        $this->_wait($this->client->RecordGauge((new RecordGaugeRequest())
+        $request = (new RecordGaugeRequest())
             ->setNamespace($namespace)
             ->setName($name)
             ->setValue($value)
-            ->setLabels($labels)
-        ));
+            ->setLabels($labels);
+
+        $this->client()
+            ->recordGauge($request);
     }
 
-    /**
-     * generic wrapper for the wait method and error handling
-     *
-     * @param UnaryCall $call
-     * @return mixed
-     * @throws Exception
-     */
-    protected function _wait(UnaryCall $call)
-    {
-        list($response, $status) = $call->wait();
 
-        $status  = $status ?? new \stdClass();
-        $code    = $status->code ?? null;
-        $details = $status->details ?? null;
-
-        if ($code || $details) {
-            throw new Exception($details ?? 'unkown grpc error', $code ?? 0);
-        }
-
-        if (!$response) {
-            throw new Exception('empty response with no error');
-        }
-
-        return $response;
-    }
 }
