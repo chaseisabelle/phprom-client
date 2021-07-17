@@ -66,6 +66,8 @@ when running on a local network:
 #### get the metrics for the prometheus scraper
 ```php
 print($phprom->get());
+// or...
+echo $phprom->get();
 ```
 
 #### register and record metrics automagically
