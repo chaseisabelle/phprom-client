@@ -159,6 +159,10 @@ abstract class Metric
      */
     public function record(float $value, array $labels = []): void
     {
+        if (!$this->registered()) {
+            $this->setLabels(array_keys($labels));
+        }
+
         $this->register();
         $this->_record($value, $labels);
     }
